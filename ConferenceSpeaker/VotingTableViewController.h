@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface VotingTableViewController : UITableViewController <UITableViewDelegate, UITableViewDataSource>
+@interface VotingTableViewController : UITableViewController <UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegate>
 
 @end

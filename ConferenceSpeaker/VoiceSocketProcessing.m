@@ -7,84 +7,63 @@
 //
 
 #import "VoiceSocketProcessing.h"
+#import "Novocaine.h"
 
 @implementation VoiceSocketProcessing
 {
-    GCDAsyncSocket *voiceAsyncSocket;
+    Novocaine         *audio;
+    GCDAsyncUdpSocket *asyncSocket;
+    NSString *_host;
+    UInt32    _port;
 }
 
-
-- (instancetype)init
+- (instancetype)initWithHost:(NSString *)host andPort:(UInt32)port
 {
     self = [super init];
     if (self) {
-
+        asyncSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self
+                                                    delegateQueue:dispatch_get_main_queue()];
+        _host = host;
+        _port = port;
+        
+        audio = [Novocaine audioManager];
+        AudioStreamBasicDescription f = [audio inputFormat];
+        NSLog(@"Format: c: %i w:%i sr: %f fs: %i", f.mChannelsPerFrame, f.mBitsPerChannel, f.mSampleRate, f.mBytesPerFrame);
+        [audio setInputBlock:^(float *data, UInt32 numFrames, UInt32 numChannels) {
+            short monoLength = numFrames / numChannels / 2;
+            SInt16 *buf = calloc(monoLength, sizeof(SInt16));
+            SInt16 *buf_p = buf;
+            short step = numChannels == 1 ? 2 : 4; // Dummy resampler & deInterleave
+            for (short i = 0; i < monoLength; ++i) {
+                *buf_p++ = (data[step*i] * 30000);
+            }
+            // Send data
+            [self->asyncSocket sendData: [[NSData alloc] initWithBytes:buf
+                                                                length:monoLength*sizeof(SInt16)]
+                                 toHost:_host
+                                   port:_port
+                            withTimeout:-1
+                                    tag:0];
+            free(buf);
+        }];
     }
     return self;
 }
 
-- (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
+- (void)start
 {
-    NSLog(@"socket:%p didConnectToHost:%@ port:%hu", sock, host, port);
-    
-    {
-        // Connected to normal server (HTTP)
-        
-#if ENABLE_BACKGROUNDING && !TARGET_IPHONE_SIMULATOR
-        {
-            // Backgrounding doesn't seem to be supported on the simulator yet
-            
-            [sock performBlock:^{
-                if ([sock enableBackgroundingOnSocket])
-                    DDLogInfo(@"Enabled backgrounding on socket");
-                else
-                    DDLogWarn(@"Enabling backgrounding failed!");
-            }];
-        }
-#endif
-    }
-    
+    [audio play];
 }
 
-- (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
+- (void)terminate
 {
-    NSLog(@"socket:%p didWriteDataWithTag:%ld", sock, tag);
+    [audio pause];
+    [asyncSocket close];
 }
 
-- (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
+- (void)socket:(GCDAsyncUdpSocket *)sock didWriteDataWithTag:(long)tag
 {
-    NSLog(@"read");
+//    NSLog(@"socket:%p didWriteDataWithTag:%ld", sock, tag);
 }
 
-- (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
-{
-    NSLog(@"socketDidDisconnect:%p withError: %@", sock, err);
-    
-}
-
-- (void)openVoiceTCPSocket: (NSDictionary *)voiceSocketDictionary
-{
-    dispatch_queue_t globalQueue = dispatch_get_main_queue();
-    
-    voiceAsyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue: globalQueue];
-    NSString *host = voiceSocketDictionary[kHostKey];
-    uint16_t port = [voiceSocketDictionary[kPortKey] integerValue];
-    
-    
-    NSError *error = nil;
-    if (![voiceAsyncSocket connectToHost:host onPort:port error:&error])
-    {
-        NSLog(@"Error connecting: %@", error);
-    }
-}
-
-- (void)sendVoice
-{
-    NSArray *pathComponents = [NSArray arrayWithObjects:
-                               [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject],
-                               @"MyAudioMemo",
-                               nil];
-    NSData *data = [NSData dataWithContentsOfURL:[NSURL fileURLWithPathComponents:pathComponents]];
-    [voiceAsyncSocket writeData:data withTimeout:10 tag:1];
-}
 @end

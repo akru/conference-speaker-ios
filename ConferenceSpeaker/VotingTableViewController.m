@@ -14,14 +14,53 @@
 @interface VotingTableViewController ()
 {
     ServerDataProcessing *serverDataProcessing;
-    NSInteger countRows;
-    NSDictionary *votingDictionary;
+    NSInteger             countRows;
+    NSDictionary         *votingDictionary;
+    NSString             *answerIx;
 }
 @property (nonatomic, strong) UIPanGestureRecognizer *dynamicTransitionPanGesture;
 @property (nonatomic, strong) NSArray *votingItems;
 @end
 
 @implementation VotingTableViewController
+
+- (void)navButtonSetup {
+    UIImage *buttonImage = [UIImage imageNamed:@"back_button"];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setImage:buttonImage forState:UIControlStateNormal];
+    button.frame = CGRectMake(0, 0, 132, 40);
+    [button addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *customBarItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    self.navigationItem.leftBarButtonItem = customBarItem;
+}
+
+- (void)sendAnswerAlert {
+    NSString *fullAnswer;
+    if ([[votingDictionary objectForKey:kModeKey] isEqualToString:kSimpleMode])
+        fullAnswer = [answerIx integerValue] ? @"Да" : @"Нет";
+    else
+        fullAnswer = [[votingDictionary objectForKey:kAnswersKey]
+                                       objectAtIndex:[answerIx integerValue]];
+    NSString *message = [@"Подтвердить выбор пункта " stringByAppendingString:
+                         fullAnswer];
+    [[[UIAlertView alloc] initWithTitle:@"ГОЛОСОВАНИЕ"
+                                message:message
+                               delegate:self
+                      cancelButtonTitle:nil
+                      otherButtonTitles:@"Отмена", @"Подтверждаю", nil] show];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    switch (buttonIndex) {
+        case 1:
+            [serverDataProcessing votingRequest:answerIx];
+            break;
+            
+        default:
+            break;
+    }
+}
 
 - (void)viewDidLoad
 {
@@ -32,29 +71,19 @@
     self.tableView.delegate = self;
     
     serverDataProcessing = [ServerDataProcessing sharedModel];
-    
-    
     votingDictionary = [serverDataProcessing voteDictionary];
     if ([[votingDictionary objectForKey:kModeKey] isEqualToString: @"simple"])
-    {
-        _votingItems = [NSArray arrayWithObjects:@"ДА", @"НЕТ", nil] ;
-        
-    }
+        _votingItems = [NSArray arrayWithObjects:@"НЕТ", @"ДА", nil] ;
     else
-    {
         _votingItems = [votingDictionary objectForKey: kAnswersKey];
-        
-    }
-    countRows = [_votingItems count]+2;
+    
+    countRows = [_votingItems count]+1;
     NSLog(@"%@", _votingItems);
 
-    
-//    _serverItems = @[@"Server 1", @"Server 2", @"Server 3", @"Server 4"];
-    
-
     [self menuSettings];
-
-    
+    [self navButtonSetup];
+    // Reset answer row
+    answerIx = nil;
 
     // Uncomment the following line to preserve selection between presentations.
 //    self.clearsSelectionOnViewWillAppear = NO;
@@ -69,6 +98,11 @@
     
 //    [self tableView:self.tableView didSelectRowAtIndexPath:[self.tableView indexPathForSelectedRow]];
 }
+
+- (void)back {
+    [self.slidingViewController anchorTopViewToRightAnimated:YES];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -106,23 +140,12 @@
         cell.userInteractionEnabled = NO;
         
     }
-    else if (indexPath.row >0 && indexPath.row < countRows-1) {
+    else if (indexPath.row) {
         
         cell.textLabel.text = _votingItems[indexPath.row - 1];
 //        cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"textfield_bg"]];
         cell.userInteractionEnabled = YES;
     }
-    else if (indexPath.row == countRows-1)
-    {
-        cell.textLabel.text = @"ПРОГОЛОСОВАТЬ";
-        cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        UIImageView* imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-        imgView.image = [UIImage imageNamed:@"button_bg"];
-        
-        cell.backgroundView = imgView;
-        cell.userInteractionEnabled = NO;
-    }
-    
     
     [cell setBackgroundColor:[UIColor clearColor]];
     
@@ -132,21 +155,13 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *answer;
-    if ([[votingDictionary objectForKey:kModeKey] isEqualToString: @"simple"])
-    {
-        if (indexPath.row == 1) {
-            answer = @"true";
-        }
-        else
-            answer = @"false";
-        
+    NSLog(@"tableView ix %i", indexPath.row);
+    if (indexPath.row) {
+        // For the Simple mode:
+        //   first row(0) - false, second(1) - true
+        answerIx = [NSString stringWithFormat:@"%i",indexPath.row-1];
+        [self sendAnswerAlert];
     }
-    else
-    {
-        answer = [NSString stringWithFormat:@"%ld", (long)indexPath.row ];
-    }
-    [serverDataProcessing votingRequest:answer];
 }
 
 

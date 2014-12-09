@@ -7,18 +7,20 @@
 //
 
 #import "ServerDataProcessing.h"
-#import "TCPSocketConnection.h"
-#import "VoiceSocketProcessing.h"
+#import "CommunicationModel.h"
 
 #define REGISTRARTION 1
 #define OPEN_CHANNEL  2
 #define CLOSE_CHANNEL 3
 #define VOTING        4
 
+#define TIMEOUT       -1
+
 @implementation ServerDataProcessing
 {
-    BOOL registreredUser;
-    NSDictionary *voiceSocketDictionary;
+    BOOL            registreredUser;
+    GCDAsyncSocket *asyncSocket;
+    NSUserDefaults *userDef;
 }
 
 + (ServerDataProcessing *)sharedModel
@@ -26,11 +28,10 @@
     static dispatch_once_t once;
     static ServerDataProcessing *sharedModel = nil;
     dispatch_once(&once, ^{
-        sharedModel = [[self alloc]init];
+        sharedModel = [[self alloc] init];
     });
     return sharedModel;
 }
-
 
 - (instancetype)init
 {
@@ -39,6 +40,9 @@
         serverUUIDArray = [NSMutableArray array];
         serverInfoArray = [NSMutableArray array];
         voteUUIDArray = [NSMutableArray array];
+        asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self
+                                                 delegateQueue:dispatch_get_main_queue()];
+        userDef = [[NSUserDefaults alloc] initWithSuiteName:@"ConferenceSpeaker"];
     }
     return self;
 }
@@ -46,7 +50,9 @@
 - (void)udpServerData:(NSData *)message
 {
     NSError *error;
-    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:message options:kNilOptions error:&error];
+    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:message
+                                                               options:kNilOptions
+                                                                 error:&error];
     
     NSString *uuid = [dictionary objectForKey:kUUIDKey];
     NSDictionary *info = [dictionary objectForKey:kInfoKey];
@@ -72,9 +78,6 @@
     }
 }
 
-
-
-
 - (NSDictionary *)serverInfo: (NSString *)serverName
 {
     for (NSInteger i=0; [serverInfoArray count]; i++)
@@ -86,6 +89,11 @@
         }
     }
     return nil;
+}
+
+- (NSUserDefaults *)settings
+{
+    return userDef;
 }
 
 - (NSArray *)serverNameArray
@@ -104,7 +112,6 @@
     return votingDictionary;
 }
 
-
 //- (BOOL)votingAvability
 //{
 //    if ([votingDictionary objectForKey:kQuestionKey]) {
@@ -114,34 +121,10 @@
 //        return NO;
 //}
 
-
-- (BOOL)sendRegistationInfo
+-(void)connect
 {
-    NSDictionary *registrationDictionary = @{kRegKey: kRequestKey, kUserKey: [[NSUserDefaults standardUserDefaults] objectForKey:@"UserData"]};
-    NSLog(@"%@", registrationDictionary);
-
-//    NSError *error = nil;
-//    NSData *jsonData=[NSJSONSerialization dataWithJSONObject:registrationDictionary options:NSJSONWritingPrettyPrinted error:&error];
-    
-//    TCPSocketConnection *tcpSocket = [TCPSocketConnection sharedModel];
-    
-    [self setupTCPSocket];
-    
-    
-    return YES;
-}
-
-
-
-
--(void)setupTCPSocket
-{
-    dispatch_queue_t mainQueue =  dispatch_get_main_queue();
-    
-    asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:mainQueue];
-    
-    NSString *selectedServer = [[NSUserDefaults standardUserDefaults] objectForKey:kSelectedServerKey];
-    NSDictionary *serverInfo;
+    NSString *selectedServer = [userDef objectForKey:kSelectedServerKey];
+    NSDictionary *serverInfo = nil;
     for (NSInteger i=0; i < [serverUUIDArray count]; i++)
     {
         if ([[serverInfoArray objectAtIndex:i][kNameKey] isEqualToString: selectedServer])
@@ -149,27 +132,82 @@
             serverInfo = [serverInfoArray objectAtIndex:i];
         }
     }
-    
-//    NSDictionary *serverInfo = [serverInfoArray objectAtIndex: [serverUUIDArray indexOfObject: selectedServer]];
+    if (!serverInfo)
+        return;
     
     NSString *host = serverInfo[kAddressKey];// @"192.168.0.104";
     uint16_t port = [serverInfo[kPortKey] integerValue];//35001;
-    
     
     NSError *error = nil;
     if (![asyncSocket connectToHost:host onPort:port error:&error])
     {
         NSLog(@"Error connecting: %@", error);
     }
-    
-    
+}
+
+- (void)registrationRequest
+{
+    RegistrationRequest *req = [[RegistrationRequest alloc] init];
+    req.request = @"registration";
+    req.user = [userDef objectForKey:kUserDataKey];
+    NSData *jsonData = [[req toJSONString] dataUsingEncoding:NSUTF8StringEncoding];
+
+    [asyncSocket readDataWithTimeout:TIMEOUT tag:REGISTRARTION];
+    [asyncSocket writeData:jsonData withTimeout:TIMEOUT tag:REGISTRARTION];
 }
 
 
+- (void)openChannelRequest
+{
+    NSError *error = nil;
+    NSData *jsonData=[NSJSONSerialization dataWithJSONObject:@{kRequestKey: @"channel_open"}
+                                                     options:NSJSONWritingPrettyPrinted
+                                                       error:&error];
+    
+    [asyncSocket readDataWithTimeout:TIMEOUT tag:OPEN_CHANNEL];
+    [asyncSocket writeData:jsonData withTimeout:TIMEOUT tag:OPEN_CHANNEL];
+}
+
+- (void)closeChannelRequest
+{
+    NSError *error = nil;
+    NSData *jsonData=[NSJSONSerialization dataWithJSONObject:@{kRequestKey: @"channel_close"} options:NSJSONWritingPrettyPrinted error:&error];
+    
+    [asyncSocket readDataWithTimeout:TIMEOUT tag:CLOSE_CHANNEL];
+    [asyncSocket writeData:jsonData withTimeout:TIMEOUT tag:CLOSE_CHANNEL];
+}
+
+- (void)votingRequest:(NSString *)answer
+{
+    NSString *jsonString;
+    int answerInt = [answer integerValue];
+    NSLog(@"Answer: %i", answerInt);
+    if ([[votingDictionary objectForKey:kModeKey] isEqualToString: kSimpleMode]) {
+        VoteSimpleRequest *req = [[VoteSimpleRequest alloc] init];
+        req.request = kVoteKey;
+        req.uuid = [votingDictionary objectForKey:kUUIDKey];
+        req.answer = answerInt != 0;
+        jsonString = [req toJSONString];
+    } else {
+        VoteCustomRequest *req = [[VoteCustomRequest alloc] init];
+        req.request = kVoteKey;
+        req.uuid = [votingDictionary objectForKey:kUUIDKey];
+        req.answer = answerInt - 1;
+        jsonString = [req toJSONString];
+    }
+    
+    [asyncSocket readDataWithTimeout:TIMEOUT tag:VOTING];
+    [asyncSocket writeData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]
+               withTimeout:TIMEOUT
+                       tag:VOTING];
+}
+
+#pragma mark Socket Delegate
+
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
 {
-    NSLog(@"socket:%p didConnectToHost:%@ port:%hu", sock, host, port);
-
+    NSLog(@"socket:%p didConnectToHost:%@ port:%hu flag: %@", sock, host, port, [sock isConnected] ? @"Y" : @"N");
+    NSLog(@"localHost :%@ port:%hu", [sock localHost], [sock localPort]);
     {
         // Connected to normal server (HTTP)
         
@@ -186,7 +224,6 @@
         }
 #endif
     }
-    
 }
 
 
@@ -198,114 +235,54 @@
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
     NSLog(@"socket:%p didReadData:withTag:%ld", sock, tag);
-    
+    // Parsing
     NSError *error = nil;
-    NSString *httpResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    
-    if (tag == REGISTRARTION) {
-        if ([dictionary objectForKey:kErrorKey]) {
-
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"ConnectionStatus" object:nil userInfo:@{kRequestKey: kRegKey ,kErrorKey:[dictionary objectForKey:kErrorKey]}];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data
+                                                          options:kNilOptions
+                                                            error:&error];
+    if ([json objectForKey:kErrorKey]) {
+        switch (tag) {
+            case VOTING:
+                [[[UIAlertView alloc] initWithTitle:@"ГОЛОСОВАНИЕ"
+                                            message:[json objectForKey:@"description"]
+                                           delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles: nil] show];
+                break;
+                
+            default:
+                break;
         }
-        else
-        {
-            registreredUser = YES;
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"ConnectionStatus" object:nil userInfo:dictionary];
-        }
-    }
-    else if (tag == OPEN_CHANNEL)
-    {
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"ConnectionStatus" object:nil userInfo:dictionary];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"ConnectionStatus"
+                                                            object:nil
+                                                          userInfo:@{kRequestKey: kRegKey, kErrorKey:[json objectForKey:kErrorKey]}];
+        NSLog(@"Error: %@", [json objectForKey:@"description"]);
         
-        if ([dictionary objectForKey:kErrorKey])
-        {
-            //!!
+    } else {
+        switch (tag) {
+            case REGISTRARTION:
+                registreredUser = YES;
+                break;
+            case VOTING:
+                [[[UIAlertView alloc] initWithTitle:@"ГОЛОСОВАНИЕ"
+                                            message:@"Ваш голос принят!"
+                                           delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles: nil] show];
+                break;
+            default:
+                break;
         }
-        else
-        {
-//            voiceSocketDictionary = [dictionary objectForKey:kChannelKey];
-//            VoiceSocketProcessing *voiceSocket = [[VoiceSocketProcessing alloc]init];
-//            [voiceSocket openVoiceTCPSocket: voiceSocketDictionary];
-//            [self openVoiceTCPSocket];
-        }
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"ConnectionStatus"
+                                                            object:nil
+                                                          userInfo:json];
     }
-    
-
-    
-    NSLog(@"HTTP Response:\n%@", httpResponse);
-    
 }
-
-- (void)registrationRequest
-{
-    NSError *error;
-    NSArray *objects=[[NSArray alloc]initWithObjects:@"registration", [[NSUserDefaults standardUserDefaults]objectForKey:kUserDataKey],nil];
-    NSArray *keys=[[NSArray alloc]initWithObjects:@"request", @"user", nil];
-    NSDictionary *dict=[NSDictionary dictionaryWithObjects:objects forKeys:keys];
-    NSLog(@"%@",dict);
-    NSData *jsonData=[NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:&error];
-    
-    
-    
-    [asyncSocket writeData:jsonData withTimeout: 10 tag: REGISTRARTION];
-    [asyncSocket readDataWithTimeout: 10 tag: REGISTRARTION];
-}
-
-
-- (void)openChannelRequest
-{
-    NSError *error = nil;
-    NSData *jsonData=[NSJSONSerialization dataWithJSONObject:@{kRequestKey: @"channel_open"} options:NSJSONWritingPrettyPrinted error:&error];
-    [asyncSocket writeData:jsonData withTimeout:100 tag:OPEN_CHANNEL];
-    [asyncSocket readDataWithTimeout:200 tag:OPEN_CHANNEL];
-}
-
-- (void)closeChannelRequest
-{
-    NSError *error = nil;
-    NSData *jsonData=[NSJSONSerialization dataWithJSONObject:@{kRequestKey: @"channel_close"} options:NSJSONWritingPrettyPrinted error:&error];
-    [asyncSocket writeData:jsonData withTimeout:10 tag:CLOSE_CHANNEL];
-//    [asyncSocket readDataWithTimeout:200 tag:CLOSE_CHANNEL];
-}
-
-- (void)votingRequest: (NSString *)answer
-{
-    NSError *error = nil;
-    NSLog(@"%@", @{kRequestKey: kVoteKey, kUUIDKey: [votingDictionary objectForKey:kUUIDKey], kAnswerKey: answer});
-    NSData *jsonData=[NSJSONSerialization dataWithJSONObject:@{kRequestKey: kVoteKey, kUUIDKey: [votingDictionary objectForKey:kUUIDKey], kAnswerKey: answer} options:NSJSONWritingPrettyPrinted error:&error];
-    [asyncSocket writeData:jsonData withTimeout:10 tag:VOTING];
-    [asyncSocket readDataWithTimeout:20 tag:VOTING];
-}
-
 
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
 {
     NSLog(@"socketDidDisconnect:%p withError: %@", sock, err);
-    
+    registreredUser = false;
 }
-
-
-//- (void)openVoiceTCPSocket
-//{
-//    dispatch_queue_t globalQueue = dispatch_get_main_queue(); //dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0); //dispatch_get_main_queue();
-//    
-//    voiceAsyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:globalQueue];
-//    
-//    NSString *host = voiceSocketDictionary[kHostKey];
-//    uint16_t port = [voiceSocketDictionary[kPortKey] integerValue];
-//    
-//    
-//    NSError *error = nil;
-//    if (![voiceAsyncSocket connectToHost:host onPort:port error:&error])
-//    {
-//        NSLog(@"Error connecting: %@", error);
-//    }
-//    
-//    
-//}
-
-
-
 
 @end

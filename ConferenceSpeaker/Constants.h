@@ -28,6 +28,8 @@
 #define kQuestionKey    @"question"
 #define kModeKey        @"mode"
 #define kAnswersKey     @"answers"
+#define kSimpleMode     @"simple"
+#define kCustomMode     @"custom"
 
 #define kResultKey      @"result"
 #define kErrorKey       @"error"

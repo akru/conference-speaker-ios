@@ -13,6 +13,18 @@
 		530838121A1B7BCD001FA202 /* VotingTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 530838111A1B7BCD001FA202 /* VotingTableViewController.m */; };
 		530838171A1B81CD001FA202 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 530838161A1B81CD001FA202 /* Reachability.m */; };
 		5308381B1A1BA9FC001FA202 /* ServerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5308381A1A1BA9FC001FA202 /* ServerViewController.m */; };
+		BDF519AE1A252722003D742C /* Novocaine.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519A91A252722003D742C /* Novocaine.m */; };
+		BDF519CA1A2629A7003D742C /* JSONModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519B31A2629A7003D742C /* JSONModel.m */; };
+		BDF519CB1A2629A7003D742C /* JSONModelArray.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519B51A2629A7003D742C /* JSONModelArray.m */; };
+		BDF519CC1A2629A7003D742C /* JSONModelClassProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519B71A2629A7003D742C /* JSONModelClassProperty.m */; };
+		BDF519CD1A2629A7003D742C /* JSONModelError.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519B91A2629A7003D742C /* JSONModelError.m */; };
+		BDF519CE1A2629A7003D742C /* NSArray+JSONModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519BC1A2629A7003D742C /* NSArray+JSONModel.m */; };
+		BDF519CF1A2629A7003D742C /* JSONAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519C01A2629A7003D742C /* JSONAPI.m */; };
+		BDF519D01A2629A7003D742C /* JSONHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519C21A2629A7003D742C /* JSONHTTPClient.m */; };
+		BDF519D11A2629A7003D742C /* JSONModel+networking.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519C41A2629A7003D742C /* JSONModel+networking.m */; };
+		BDF519D21A2629A7003D742C /* JSONKeyMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519C71A2629A7003D742C /* JSONKeyMapper.m */; };
+		BDF519D31A2629A7003D742C /* JSONValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519C91A2629A7003D742C /* JSONValueTransformer.m */; };
+		BDF519D61A262CBC003D742C /* CommunicationModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BDF519D51A262CBC003D742C /* CommunicationModel.m */; };
 		F32765061A1AB8A60071EA4C /* ECPercentDrivenInteractiveTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = F32764FA1A1AB8A60071EA4C /* ECPercentDrivenInteractiveTransition.m */; };
 		F32765071A1AB8A60071EA4C /* ECSlidingAnimationController.m in Sources */ = {isa = PBXBuildFile; fileRef = F32764FC1A1AB8A60071EA4C /* ECSlidingAnimationController.m */; };
 		F32765081A1AB8A60071EA4C /* ECSlidingInteractiveTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = F32764FF1A1AB8A60071EA4C /* ECSlidingInteractiveTransition.m */; };
@@ -32,7 +44,6 @@
 		F327668D1A1ADB070071EA4C /* DDMultiFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = F32766841A1ADB070071EA4C /* DDMultiFormatter.m */; };
 		F327668E1A1ADB070071EA4C /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = F32766851A1ADB070071EA4C /* README.txt */; };
 		F32766B11A1ADF000071EA4C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F32766941A1ADF000071EA4C /* AppDelegate.m */; };
-		F32766B41A1ADF000071EA4C /* ConferenceSpeaker-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F32766991A1ADF000071EA4C /* ConferenceSpeaker-Info.plist */; };
 		F32766B61A1ADF000071EA4C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F327669D1A1ADF000071EA4C /* InfoPlist.strings */; };
 		F32766B71A1ADF000071EA4C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F327669F1A1ADF000071EA4C /* Images.xcassets */; };
 		F32766B81A1ADF000071EA4C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F32766A01A1ADF000071EA4C /* main.m */; };
@@ -45,8 +56,6 @@
 		F32766C01A1ADF000071EA4C /* UserDataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F32766B01A1ADF000071EA4C /* UserDataViewController.m */; };
 		F32766C11A1ADFFD0071EA4C /* Main-iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F32766951A1ADF000071EA4C /* Main-iPad.storyboard */; };
 		F32766C21A1ADFFD0071EA4C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F32766971A1ADF000071EA4C /* Main.storyboard */; };
-		F3526EF21A1D55390083A989 /* UDPSocketConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = F3526EF11A1D55390083A989 /* UDPSocketConnection.m */; };
-		F3526EF81A1D5CD70083A989 /* TCPSocketConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = F3526EF71A1D5CD70083A989 /* TCPSocketConnection.m */; };
 		F3526EFB1A1D5E900083A989 /* ServerDataProcessing.m in Sources */ = {isa = PBXBuildFile; fileRef = F3526EFA1A1D5E900083A989 /* ServerDataProcessing.m */; };
 		F3526F001A1E06CB0083A989 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F3526EFF1A1E06CB0083A989 /* AVFoundation.framework */; };
 		F3526F031A214C540083A989 /* ProgramViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F3526F021A214C540083A989 /* ProgramViewController.m */; };
@@ -70,6 +79,31 @@
 		530838191A1BA9FC001FA202 /* ServerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerViewController.h; sourceTree = "<group>"; };
 		5308381A1A1BA9FC001FA202 /* ServerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerViewController.m; sourceTree = "<group>"; };
 		536915851A1CF6D2005F5301 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		BDF519A81A252722003D742C /* Novocaine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Novocaine.h; sourceTree = "<group>"; };
+		BDF519A91A252722003D742C /* Novocaine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Novocaine.m; sourceTree = "<group>"; };
+		BDF519B21A2629A7003D742C /* JSONModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONModel.h; sourceTree = "<group>"; };
+		BDF519B31A2629A7003D742C /* JSONModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONModel.m; sourceTree = "<group>"; };
+		BDF519B41A2629A7003D742C /* JSONModelArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONModelArray.h; sourceTree = "<group>"; };
+		BDF519B51A2629A7003D742C /* JSONModelArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONModelArray.m; sourceTree = "<group>"; };
+		BDF519B61A2629A7003D742C /* JSONModelClassProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONModelClassProperty.h; sourceTree = "<group>"; };
+		BDF519B71A2629A7003D742C /* JSONModelClassProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONModelClassProperty.m; sourceTree = "<group>"; };
+		BDF519B81A2629A7003D742C /* JSONModelError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONModelError.h; sourceTree = "<group>"; };
+		BDF519B91A2629A7003D742C /* JSONModelError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONModelError.m; sourceTree = "<group>"; };
+		BDF519BB1A2629A7003D742C /* NSArray+JSONModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+JSONModel.h"; sourceTree = "<group>"; };
+		BDF519BC1A2629A7003D742C /* NSArray+JSONModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+JSONModel.m"; sourceTree = "<group>"; };
+		BDF519BD1A2629A7003D742C /* JSONModelLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONModelLib.h; sourceTree = "<group>"; };
+		BDF519BF1A2629A7003D742C /* JSONAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONAPI.h; sourceTree = "<group>"; };
+		BDF519C01A2629A7003D742C /* JSONAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONAPI.m; sourceTree = "<group>"; };
+		BDF519C11A2629A7003D742C /* JSONHTTPClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONHTTPClient.h; sourceTree = "<group>"; };
+		BDF519C21A2629A7003D742C /* JSONHTTPClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONHTTPClient.m; sourceTree = "<group>"; };
+		BDF519C31A2629A7003D742C /* JSONModel+networking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "JSONModel+networking.h"; sourceTree = "<group>"; };
+		BDF519C41A2629A7003D742C /* JSONModel+networking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "JSONModel+networking.m"; sourceTree = "<group>"; };
+		BDF519C61A2629A7003D742C /* JSONKeyMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKeyMapper.h; sourceTree = "<group>"; };
+		BDF519C71A2629A7003D742C /* JSONKeyMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKeyMapper.m; sourceTree = "<group>"; };
+		BDF519C81A2629A7003D742C /* JSONValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONValueTransformer.h; sourceTree = "<group>"; };
+		BDF519C91A2629A7003D742C /* JSONValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONValueTransformer.m; sourceTree = "<group>"; };
+		BDF519D41A2629F0003D742C /* CommunicationModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommunicationModel.h; sourceTree = "<group>"; };
+		BDF519D51A262CBC003D742C /* CommunicationModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommunicationModel.m; sourceTree = "<group>"; };
 		F32764F91A1AB8A60071EA4C /* ECPercentDrivenInteractiveTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ECPercentDrivenInteractiveTransition.h; sourceTree = "<group>"; };
 		F32764FA1A1AB8A60071EA4C /* ECPercentDrivenInteractiveTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ECPercentDrivenInteractiveTransition.m; sourceTree = "<group>"; };
 		F32764FB1A1AB8A60071EA4C /* ECSlidingAnimationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ECSlidingAnimationController.h; sourceTree = "<group>"; };
@@ -129,10 +163,6 @@
 		F32766AE1A1ADF000071EA4C /* MEZoomAnimationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MEZoomAnimationController.m; sourceTree = "<group>"; };
 		F32766AF1A1ADF000071EA4C /* UserDataViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDataViewController.h; sourceTree = "<group>"; };
 		F32766B01A1ADF000071EA4C /* UserDataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDataViewController.m; sourceTree = "<group>"; };
-		F3526EF01A1D55390083A989 /* UDPSocketConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDPSocketConnection.h; sourceTree = "<group>"; };
-		F3526EF11A1D55390083A989 /* UDPSocketConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UDPSocketConnection.m; sourceTree = "<group>"; };
-		F3526EF61A1D5CD70083A989 /* TCPSocketConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCPSocketConnection.h; sourceTree = "<group>"; };
-		F3526EF71A1D5CD70083A989 /* TCPSocketConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCPSocketConnection.m; sourceTree = "<group>"; };
 		F3526EF91A1D5E900083A989 /* ServerDataProcessing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerDataProcessing.h; sourceTree = "<group>"; };
 		F3526EFA1A1D5E900083A989 /* ServerDataProcessing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerDataProcessing.m; sourceTree = "<group>"; };
 		F3526EFF1A1E06CB0083A989 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -240,6 +270,76 @@
 			name = UIViewControllers;
 			sourceTree = "<group>";
 		};
+		BDF519A31A252722003D742C /* Novocaine */ = {
+			isa = PBXGroup;
+			children = (
+				BDF519A81A252722003D742C /* Novocaine.h */,
+				BDF519A91A252722003D742C /* Novocaine.m */,
+			);
+			path = Novocaine;
+			sourceTree = SOURCE_ROOT;
+		};
+		BDF519B01A2629A7003D742C /* JSONModel */ = {
+			isa = PBXGroup;
+			children = (
+				BDF519B11A2629A7003D742C /* JSONModel */,
+				BDF519BA1A2629A7003D742C /* JSONModelCategories */,
+				BDF519BD1A2629A7003D742C /* JSONModelLib.h */,
+				BDF519BE1A2629A7003D742C /* JSONModelNetworking */,
+				BDF519C51A2629A7003D742C /* JSONModelTransformations */,
+			);
+			name = JSONModel;
+			path = ../JSONModel;
+			sourceTree = "<group>";
+		};
+		BDF519B11A2629A7003D742C /* JSONModel */ = {
+			isa = PBXGroup;
+			children = (
+				BDF519B21A2629A7003D742C /* JSONModel.h */,
+				BDF519B31A2629A7003D742C /* JSONModel.m */,
+				BDF519B41A2629A7003D742C /* JSONModelArray.h */,
+				BDF519B51A2629A7003D742C /* JSONModelArray.m */,
+				BDF519B61A2629A7003D742C /* JSONModelClassProperty.h */,
+				BDF519B71A2629A7003D742C /* JSONModelClassProperty.m */,
+				BDF519B81A2629A7003D742C /* JSONModelError.h */,
+				BDF519B91A2629A7003D742C /* JSONModelError.m */,
+			);
+			path = JSONModel;
+			sourceTree = "<group>";
+		};
+		BDF519BA1A2629A7003D742C /* JSONModelCategories */ = {
+			isa = PBXGroup;
+			children = (
+				BDF519BB1A2629A7003D742C /* NSArray+JSONModel.h */,
+				BDF519BC1A2629A7003D742C /* NSArray+JSONModel.m */,
+			);
+			path = JSONModelCategories;
+			sourceTree = "<group>";
+		};
+		BDF519BE1A2629A7003D742C /* JSONModelNetworking */ = {
+			isa = PBXGroup;
+			children = (
+				BDF519BF1A2629A7003D742C /* JSONAPI.h */,
+				BDF519C01A2629A7003D742C /* JSONAPI.m */,
+				BDF519C11A2629A7003D742C /* JSONHTTPClient.h */,
+				BDF519C21A2629A7003D742C /* JSONHTTPClient.m */,
+				BDF519C31A2629A7003D742C /* JSONModel+networking.h */,
+				BDF519C41A2629A7003D742C /* JSONModel+networking.m */,
+			);
+			path = JSONModelNetworking;
+			sourceTree = "<group>";
+		};
+		BDF519C51A2629A7003D742C /* JSONModelTransformations */ = {
+			isa = PBXGroup;
+			children = (
+				BDF519C61A2629A7003D742C /* JSONKeyMapper.h */,
+				BDF519C71A2629A7003D742C /* JSONKeyMapper.m */,
+				BDF519C81A2629A7003D742C /* JSONValueTransformer.h */,
+				BDF519C91A2629A7003D742C /* JSONValueTransformer.m */,
+			);
+			path = JSONModelTransformations;
+			sourceTree = "<group>";
+		};
 		F32764F81A1AB8A60071EA4C /* ECSlidingViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -277,6 +377,8 @@
 		F32766711A1ADB070071EA4C /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
+				BDF519B01A2629A7003D742C /* JSONModel */,
+				BDF519A31A252722003D742C /* Novocaine */,
 				530838141A1B8124001FA202 /* Reachability */,
 				F32764F81A1AB8A60071EA4C /* ECSlidingViewController */,
 				F32765101A1ADB000071EA4C /* GCD */,
@@ -399,14 +501,12 @@
 		F3526EEF1A1D55010083A989 /* Sockets */ = {
 			isa = PBXGroup;
 			children = (
-				F3526EF01A1D55390083A989 /* UDPSocketConnection.h */,
-				F3526EF11A1D55390083A989 /* UDPSocketConnection.m */,
-				F3526EF61A1D5CD70083A989 /* TCPSocketConnection.h */,
-				F3526EF71A1D5CD70083A989 /* TCPSocketConnection.m */,
 				F3526EF91A1D5E900083A989 /* ServerDataProcessing.h */,
 				F3526EFA1A1D5E900083A989 /* ServerDataProcessing.m */,
 				F355C8A81A22B0C600AC1B2F /* VoiceSocketProcessing.h */,
 				F355C8A91A22B0C600AC1B2F /* VoiceSocketProcessing.m */,
+				BDF519D41A2629F0003D742C /* CommunicationModel.h */,
+				BDF519D51A262CBC003D742C /* CommunicationModel.m */,
 			);
 			name = Sockets;
 			sourceTree = "<group>";
@@ -447,8 +547,13 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = "";
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Elena Alekseenko";
+				TargetAttributes = {
+					057DC257181DE6AE00D15995 = {
+						DevelopmentTeam = 2WX3KU4Q98;
+					};
+				};
 			};
 			buildConfigurationList = 057DC253181DE6AE00D15995 /* Build configuration list for PBXProject "ConferenceSpeaker" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -482,7 +587,6 @@
 				F32766B71A1ADF000071EA4C /* Images.xcassets in Resources */,
 				F355C8A71A226D6C00AC1B2F /* QuestionTableViewCell.xib in Resources */,
 				F32765F21A1ADB000071EA4C /* Documentation.html in Resources */,
-				F32766B41A1ADF000071EA4C /* ConferenceSpeaker-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -494,17 +598,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				F32766BE1A1ADF000071EA4C /* ConferenceViewController.m in Sources */,
+				BDF519CB1A2629A7003D742C /* JSONModelArray.m in Sources */,
 				F32765071A1AB8A60071EA4C /* ECSlidingAnimationController.m in Sources */,
 				F327668D1A1ADB070071EA4C /* DDMultiFormatter.m in Sources */,
 				F32766B91A1ADF000071EA4C /* MEDynamicTransition.m in Sources */,
 				F32766891A1ADB070071EA4C /* DDLog.m in Sources */,
+				BDF519CE1A2629A7003D742C /* NSArray+JSONModel.m in Sources */,
 				F32765061A1AB8A60071EA4C /* ECPercentDrivenInteractiveTransition.m in Sources */,
 				F327668B1A1ADB070071EA4C /* DDContextFilterLogFormatter.m in Sources */,
+				BDF519CD1A2629A7003D742C /* JSONModelError.m in Sources */,
 				F32765F31A1ADB000071EA4C /* GCDAsyncSocket.m in Sources */,
 				F327650B1A1AB8A60071EA4C /* UIViewController+ECSlidingViewController.m in Sources */,
 				F3526F031A214C540083A989 /* ProgramViewController.m in Sources */,
 				F327668C1A1ADB070071EA4C /* DDDispatchQueueLogFormatter.m in Sources */,
+				BDF519CF1A2629A7003D742C /* JSONAPI.m in Sources */,
+				BDF519AE1A252722003D742C /* Novocaine.m in Sources */,
 				530838171A1B81CD001FA202 /* Reachability.m in Sources */,
+				BDF519D31A2629A7003D742C /* JSONValueTransformer.m in Sources */,
 				F32766BB1A1ADF000071EA4C /* MenuViewController.m in Sources */,
 				F32766B81A1ADF000071EA4C /* main.m in Sources */,
 				F327668A1A1ADB070071EA4C /* DDTTYLogger.m in Sources */,
@@ -517,15 +627,19 @@
 				F32766861A1ADB070071EA4C /* DDAbstractDatabaseLogger.m in Sources */,
 				F32766BF1A1ADF000071EA4C /* MEZoomAnimationController.m in Sources */,
 				F32766BD1A1ADF000071EA4C /* METransitions.m in Sources */,
-				F3526EF21A1D55390083A989 /* UDPSocketConnection.m in Sources */,
+				BDF519CC1A2629A7003D742C /* JSONModelClassProperty.m in Sources */,
+				BDF519D01A2629A7003D742C /* JSONHTTPClient.m in Sources */,
 				530838121A1B7BCD001FA202 /* VotingTableViewController.m in Sources */,
 				F355C8A61A226D6C00AC1B2F /* QuestionTableViewCell.m in Sources */,
 				F32766C01A1ADF000071EA4C /* UserDataViewController.m in Sources */,
+				BDF519D61A262CBC003D742C /* CommunicationModel.m in Sources */,
 				F32766BA1A1ADF000071EA4C /* MEFoldAnimationController.m in Sources */,
 				F32766871A1ADB070071EA4C /* DDASLLogger.m in Sources */,
 				F32766B11A1ADF000071EA4C /* AppDelegate.m in Sources */,
 				F32766881A1ADB070071EA4C /* DDFileLogger.m in Sources */,
-				F3526EF81A1D5CD70083A989 /* TCPSocketConnection.m in Sources */,
+				BDF519D21A2629A7003D742C /* JSONKeyMapper.m in Sources */,
+				BDF519D11A2629A7003D742C /* JSONModel+networking.m in Sources */,
+				BDF519CA1A2629A7003D742C /* JSONModel.m in Sources */,
 				F355C8AE1A22CB0300AC1B2F /* AnswersTableViewCell.m in Sources */,
 				F32765091A1AB8A60071EA4C /* ECSlidingSegue.m in Sources */,
 			);
@@ -565,7 +679,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -604,7 +717,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -638,11 +750,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ConferenceSpeaker/ConferenceSpeaker-Prefix.pch";
 				INFOPLIST_FILE = "ConferenceSpeaker/ConferenceSpeaker-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = ConferenceSpeaker;
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -653,11 +768,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ConferenceSpeaker/ConferenceSpeaker-Prefix.pch";
 				INFOPLIST_FILE = "ConferenceSpeaker/ConferenceSpeaker-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = ConferenceSpeaker;
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};

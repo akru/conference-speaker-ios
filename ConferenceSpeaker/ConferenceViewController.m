@@ -27,14 +27,9 @@ typedef NS_ENUM (NSUInteger, StatusType) {
 @interface ConferenceViewController ()
 {
     MEZoomAnimationController *_zoomAnimationController;
-    ServerDataProcessing *serverDataProcessing;
-    StatusType currentStatus;
-    
-    AVAudioRecorder *recorder;
-    AVAudioPlayer *player;
-    
-    VoiceSocketProcessing *voiceSocket;
-
+    ServerDataProcessing      *serverDataProcessing;
+    VoiceSocketProcessing     *voiceProcessing;
+    StatusType                 currentStatus;
 }
 @property (nonatomic, strong) METransitions *transitions;
 @property (nonatomic, strong) UIPanGestureRecognizer *dynamicTransitionPanGesture;
@@ -44,6 +39,16 @@ typedef NS_ENUM (NSUInteger, StatusType) {
 @implementation ConferenceViewController
 
 #pragma mark - UIViewController
+- (void)navButtonSetup {
+    UIImage *buttonImage = [UIImage imageNamed:@"back_button"];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setImage:buttonImage forState:UIControlStateNormal];
+    button.frame = CGRectMake(0, 0, 132, 40);
+    [button addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *customBarItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    self.navigationItem.leftBarButtonItem = customBarItem;
+}
 
 - (void)viewDidLoad
 {
@@ -54,7 +59,10 @@ typedef NS_ENUM (NSUInteger, StatusType) {
     
     serverDataProcessing = [ServerDataProcessing sharedModel];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(reachabilityChanged:)
+                                                 name:kReachabilityChangedNotification
+                                               object:nil];
 
     handButton.userInteractionEnabled = NO;
     
@@ -68,21 +76,12 @@ typedef NS_ENUM (NSUInteger, StatusType) {
     [self.navigationController.view removeGestureRecognizer:self.dynamicTransitionPanGesture];
     [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
     
-    
-    UIImage *buttonImage = [UIImage imageNamed:@"back_button"];
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    [button setImage:buttonImage forState:UIControlStateNormal];
-    button.frame = CGRectMake(0, 0, 132, 40);
-    [button addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
-    
-    UIBarButtonItem *customBarItem = [[UIBarButtonItem alloc] initWithCustomView:button];
-    self.navigationItem.leftBarButtonItem = customBarItem;
+    [self navButtonSetup];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateInterfaceWithConnectionStatus:)
                                                  name:@"ConnectionStatus"
                                                object:nil];
-    
 }
 
 - (void)back {
@@ -138,31 +137,31 @@ typedef NS_ENUM (NSUInteger, StatusType) {
 
 - (void)updateInterfaceWithReachability: (Reachability *)currentReachability
 {
-    NetworkStatus netStatus = [reachability currentReachabilityStatus];
-    NSString* statusString = @"";
+//    NetworkStatus netStatus = [reachability currentReachabilityStatus];
+//    NSString* statusString = @"";
     
-    if((netStatus == ReachableViaWiFi) || (netStatus == ReachableViaWiFi))
-    {
+//    if((netStatus == ReachableViaWiFi) || (netStatus == ReachableViaWiFi))
+//    {
         [self updateInterfaceWithConnectionStatus:nil];
         
-    }
-    else
-    {
-        statusString = NSLocalizedString(@"ПОДКЛЮЧИТЕСЬ К\n WI-FI", @"Text field text for access is not available");
-        wifiImageView.image = [UIImage imageNamed:@"inactive_wifi"];
-        statusConnectImageView.image = [UIImage imageNamed:@"inactive_connection"];
-        handButton.userInteractionEnabled = NO;
-        statusLabel.text = statusString;
-        
-    }
+//    }
+//    else
+//    {
+//        statusString = NSLocalizedString(@"ПОДКЛЮЧИТЕСЬ К\n WI-FI", @"Text field text for access is not available");
+//        wifiImageView.image = [UIImage imageNamed:@"inactive_wifi"];
+//        statusConnectImageView.image = [UIImage imageNamed:@"inactive_connection"];
+//        handButton.userInteractionEnabled = NO;
+//        statusLabel.text = statusString;
+//        
+//    }
     
 }
 
 
 - (void)updateInterfaceWithConnectionStatus:(NSNotification *) notification
 {
-    NSString* statusString = @"";
-    NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults] ;
+    NSUserDefaults *userDef = [serverDataProcessing settings];
+    NSString* statusString  = @"";
     
     
     if (notification) {
@@ -194,20 +193,20 @@ typedef NS_ENUM (NSUInteger, StatusType) {
             handButton.imageView.image = [UIImage imageNamed:@"close_connect_btn"];
             wifiImageView.image = [UIImage imageNamed:@"active_micro"];
             currentStatus = kOpenSessionStatus;
-            [self initRecord];
-            [self startRecord];
-            
-            NSDictionary *voiceSocketDictionary = [nDictionary objectForKey:kChannelKey];
-            voiceSocket = [[VoiceSocketProcessing alloc]init];
-            [voiceSocket openVoiceTCPSocket: voiceSocketDictionary];
-
+//            [self initRecord];
+//            [self startRecord];
+            NSDictionary *channel = [nDictionary objectForKey:kChannelKey];
+            NSString       *host  = [channel objectForKey:kHostKey];
+            NSString       *port = [channel objectForKey:kPortKey];
+            voiceProcessing = [[VoiceSocketProcessing alloc]
+                                    initWithHost:host
+                                    andPort:[port integerValue]];
+            [voiceProcessing start];
         }
     }
     else
     {
         //init settings
-        
-
         NSArray *serversArray = [serverDataProcessing serverNameArray];
         
         if ([serversArray count] == 1) {
@@ -219,7 +218,7 @@ typedef NS_ENUM (NSUInteger, StatusType) {
             statusString = @"ПОДКЛЮЧЕНИЕ К СЕРВЕРУ";
             wifiImageView.image = [UIImage imageNamed:@"inactive_micro"];
             //send reqistrartion request
-            [serverDataProcessing setupTCPSocket];
+            [serverDataProcessing connect];
             [serverDataProcessing registrationRequest];
 
         }
@@ -253,10 +252,13 @@ typedef NS_ENUM (NSUInteger, StatusType) {
             handButton.imageView.image = [UIImage imageNamed:@"active_hand"];
             [serverDataProcessing openChannelRequest];
             break;
-        case kRequestSessionStatus:
-            break;
         case kOpenSessionStatus:
-            [self stopAndPlay];
+            [voiceProcessing terminate];
+            currentStatus = kRegisteredStatus;
+        case kRequestSessionStatus:
+            statusLabel.text = @"ПОДКЛЮЧЕН К СЕРВЕРУ";
+            handButton.imageView.image = [UIImage imageNamed:@"inactive_hand"];
+            [serverDataProcessing closeChannelRequest];
             break;
         default:
             break;
@@ -268,8 +270,12 @@ typedef NS_ENUM (NSUInteger, StatusType) {
 - (void)dealloc
 {
     
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kReachabilityChangedNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ConnectionStatus" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:kReachabilityChangedNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:@"ConnectionStatus"
+                                                  object:nil];
     [udpSocket close];
     
 }
@@ -306,7 +312,7 @@ typedef NS_ENUM (NSUInteger, StatusType) {
     
     if (msg)
     {
-        //!! может в фоне?
+        //!! может в фоне? - там немного и так пойдет
         [serverDataProcessing udpServerData:data];
     }
     else
@@ -318,73 +324,6 @@ typedef NS_ENUM (NSUInteger, StatusType) {
         NSLog(@"RECV: Unknown message from: %@:%hu", host, port);
     }
 }
-
-#pragma mark - audio
-
-- (void)initRecord
-{
-    NSArray *pathComponents = [NSArray arrayWithObjects:
-                               [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject],
-                               @"MyAudioMemo",
-                               nil];
-    NSURL *outputFileURL = [NSURL fileURLWithPathComponents:pathComponents];
-    
-    // Setup audio session
-    AVAudioSession *session = [AVAudioSession sharedInstance];
-    [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
-    
-    
-    // Define the recorder setting
-    NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
-    
-    [recordSetting setValue:[NSNumber numberWithInt:kAudioFormatLinearPCM] forKey:AVFormatIDKey];
-    [recordSetting setValue:[NSNumber numberWithFloat:22050.0] forKey:AVSampleRateKey];
-    [recordSetting setValue:[NSNumber numberWithInt:16] forKey:AVLinearPCMBitDepthKey];
-    [recordSetting setValue:[NSNumber numberWithBool:NO] forKey:AVLinearPCMIsBigEndianKey];
-    [recordSetting setValue:[NSNumber numberWithBool:NO] forKey:AVLinearPCMIsFloatKey];
-    
-    // Initiate and prepare the recorder
-    recorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:nil];
-    
-    recorder.delegate = self;
-    recorder.meteringEnabled = YES;
-    [recorder prepareToRecord];
-}
-
-- (void)startRecord {
-    AVAudioSession *session = [AVAudioSession sharedInstance];
-    [session setActive:YES error:nil];
-    
-    // Start recording
-    [recorder record];
-    
-}
-
-- (void)stopAndPlay
-{
-    [recorder stop];
-    [voiceSocket sendVoice];
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    [audioSession setActive:NO error:nil];
-    if (!recorder.recording){
-        player = [[AVAudioPlayer alloc] initWithContentsOfURL:recorder.url error:nil];
-        [player setDelegate:self];
-        [player play];
-    }
-    
-}
-
-#pragma mark - AVAudioPlayerDelegate
-
-- (void) audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag{
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Done"
-                                                    message: @"Finish playing the recording!"
-                                                   delegate: nil
-                                          cancelButtonTitle:@"OK"
-                                          otherButtonTitles:nil];
-    [alert show];
-}
-
 
 #pragma mark - show Voting alert
 - (void) showVotingAlert

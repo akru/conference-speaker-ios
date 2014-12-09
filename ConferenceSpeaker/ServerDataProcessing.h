@@ -11,8 +11,6 @@
 
 @protocol ServerConnection <NSObject>
 
-
-
 @end
 
 
@@ -20,9 +18,7 @@
 {
     NSMutableArray *serverUUIDArray;
     NSMutableArray *serverInfoArray;
-    NSDictionary *votingDictionary;
-    GCDAsyncSocket *asyncSocket;
-    GCDAsyncSocket *voiceAsyncSocket;
+    NSDictionary   *votingDictionary;
     NSMutableArray *voteUUIDArray;
 }
 
@@ -32,11 +28,12 @@
 - (NSArray *)serverNameArray;
 - (BOOL)serversAvalibility;
 - (BOOL)votingAvability;
+- (NSUserDefaults *)settings;
+- (void)connect;
 - (void)closeChannelRequest;
 - (void)openChannelRequest;
 - (NSDictionary *)voteDictionary;
 - (void)votingRequest: (NSString *)answer;
-- (void)setupTCPSocket;
 - (void)registrationRequest;
 
 @property BOOL serversAvalibility;

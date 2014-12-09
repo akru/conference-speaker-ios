@@ -7,13 +7,52 @@
 #import "UserDataViewController.h"
 #import "MEDynamicTransition.h"
 #import "UIViewController+ECSlidingViewController.h"
+#import "ServerDataProcessing.h"
 
 @interface UserDataViewController ()
+{
+    NSUserDefaults *defs;
+}
 @property (nonatomic, strong) UIPanGestureRecognizer *dynamicTransitionPanGesture;
 @end
 
 @implementation UserDataViewController
 
+- (void)navButtonSetup {
+    UIImage *buttonImage = [UIImage imageNamed:@"back_button"];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setImage:buttonImage forState:UIControlStateNormal];
+    button.frame = CGRectMake(0, 0, 132, 40);
+    [button addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *customBarItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    self.navigationItem.leftBarButtonItem = customBarItem;
+}
+
+- (void)loadSettings {
+    NSDictionary *userData = [defs valueForKey:kUserDataKey];
+    if (userData)
+    {
+        [nameTextField setText:[userData objectForKey:kNameKey]];
+        [companyTextField setText:[userData objectForKey:kCompanyKey]];
+        [rankTextFiled setText:[userData objectForKey:kTitleKey]];
+        NSLog(@"UserData loaded: %@", userData);
+    }
+}
+
+- (void)saveSettings {
+    //create dictionary of user data
+    NSString *name = [nameTextField.text length]?nameTextField.text:kUnknownKey;
+    NSString *company = [companyTextField.text length]?companyTextField.text:kUnknownKey;
+    NSString *rank = [rankTextFiled.text length]?rankTextFiled.text:kUnknownKey;
+    
+    NSDictionary *userDictionary = @{kNameKey : name,
+                                     kCompanyKey : company,
+                                     kTitleKey : rank};
+    NSLog(@"UserData saved %@", userDictionary);
+    
+    [defs setObject:userDictionary forKey:kUserDataKey];
+}
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -30,7 +69,9 @@
         [self.navigationController.view removeGestureRecognizer:self.dynamicTransitionPanGesture];
         [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
     }
+    [self loadSettings];
 }
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -40,11 +81,6 @@
     UIView *spacerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
     [nameTextField setLeftViewMode:UITextFieldViewModeAlways];
     [nameTextField setLeftView:spacerView];
-//
-    surnameTextField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:surnameTextField.placeholder attributes:@{NSForegroundColorAttributeName: placeholderColor,  NSFontAttributeName : nameTextField.font}];
-    UIView *spacerView1 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
-    [surnameTextField setLeftViewMode:UITextFieldViewModeAlways];
-    [surnameTextField setLeftView:spacerView1];
 //
     companyTextField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:companyTextField.placeholder attributes:@{NSForegroundColorAttributeName: placeholderColor,  NSFontAttributeName : companyTextField.font}];
     UIView *spacerView2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
@@ -56,18 +92,13 @@
     [rankTextFiled setLeftViewMode:UITextFieldViewModeAlways];
     [rankTextFiled setLeftView:spacerView3];
     
-    UIImage *buttonImage = [UIImage imageNamed:@"back_button"];
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    [button setImage:buttonImage forState:UIControlStateNormal];
-    button.frame = CGRectMake(0, 0, 132, 40);
-    [button addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
-    
-    UIBarButtonItem *customBarItem = [[UIBarButtonItem alloc] initWithCustomView:button];
-    self.navigationItem.leftBarButtonItem = customBarItem;
-
+    defs = [[ServerDataProcessing sharedModel] settings];
+    [self navButtonSetup];
+    [self loadSettings];
 }
 
 - (void)back {
+    [self saveSettings];
     [self.slidingViewController anchorTopViewToRightAnimated:YES];
 }
 
@@ -88,21 +119,7 @@
 
 
 - (IBAction)menuButtonTapped:(id)sender {
-    [self.slidingViewController anchorTopViewToRightAnimated:YES];
-}
-
-- (IBAction)saveButtonTapped:(id)sender
-{
-    //create dictionary of user data
-    NSString *name = [nameTextField.text length]?nameTextField.text:kUnknownKey;
-    NSString *surname = [surnameTextField.text length]?surnameTextField.text:kUnknownKey;
-    NSString *company = [companyTextField.text length]?companyTextField.text:kUnknownKey;
-    NSString *rank = [rankTextFiled.text length]?rankTextFiled.text:kUnknownKey;
-    
-    NSDictionary *userDictionary = @{kNameKey : [NSString stringWithFormat:@"%@ %@", name, surname], kCompanyKey : company, kTitleKey : rank};
-    NSLog(@"%@", userDictionary);
-    
-    [[NSUserDefaults standardUserDefaults] setObject:userDictionary forKey:@"UserData"];
+    [self saveSettings];
     [self.slidingViewController anchorTopViewToRightAnimated:YES];
 }
 

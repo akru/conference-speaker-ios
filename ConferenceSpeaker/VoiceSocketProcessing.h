@@ -7,11 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "GCDAsyncSocket.h"
+#import "GCDAsyncUdpSocket.h"
 
 @interface VoiceSocketProcessing : NSObject
-
-
-- (void)openVoiceTCPSocket: (NSDictionary *)voiceSocketDictionary;
-- (void)sendVoice;
+- (instancetype) initWithHost: (NSString*) host andPort: (UInt32) port;
+- (void)start;
+- (void)terminate;
 @end

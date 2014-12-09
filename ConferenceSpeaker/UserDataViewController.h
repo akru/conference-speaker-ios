@@ -15,7 +15,4 @@
     IBOutlet UITextField *rankTextFiled;
 }
 
-
-- (IBAction)saveButtonTapped:(id)sender;
-
 @end

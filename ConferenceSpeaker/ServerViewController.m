@@ -20,6 +20,26 @@
 
 @implementation ServerViewController
 
+- (void)navButtonSetup {
+    UIImage *buttonImage = [UIImage imageNamed:@"back_button"];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setImage:buttonImage forState:UIControlStateNormal];
+    button.frame = CGRectMake(0, 0, 132, 40);
+    [button addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *customBarItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    self.navigationItem.leftBarButtonItem = customBarItem;
+}
+
+- (void)saveSelectedServer {
+    NSUInteger selectedRow = [self.picker selectedRowInComponent:0] ;
+    NSString *selectedServer = [_pickerData objectAtIndex:selectedRow];
+    
+    [[[NSUserDefaults alloc] initWithSuiteName:@"ConferenceSpeaker"]
+        setObject:selectedServer
+           forKey:kSelectedServerKey];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     ServerDataProcessing *serverDataProcessing = [ServerDataProcessing sharedModel];
@@ -29,6 +49,12 @@
     self.picker.dataSource = self;
     self.picker.delegate = self;
     // Do any additional setup after loading the view.
+    [self navButtonSetup];
+}
+
+- (void)back {
+    [self saveSelectedServer];
+    [self.slidingViewController anchorTopViewToRightAnimated:YES];
 }
 
 - (void)didReceiveMemoryWarning
@@ -57,13 +83,7 @@
 
 - (IBAction)menuButtonTapped:(id)sender
 {
-    NSUInteger selectedRow = [self.picker selectedRowInComponent:0] ;
-    NSString *selectedServer = [_pickerData objectAtIndex:selectedRow];
-    
-    [[NSUserDefaults standardUserDefaults] setObject:selectedServer forKey:kSelectedServerKey];
-    NSLog (@"%@", selectedServer);
-    
-    
+    [self saveSelectedServer];
     [self.slidingViewController anchorTopViewToRightAnimated:YES];
 }
 

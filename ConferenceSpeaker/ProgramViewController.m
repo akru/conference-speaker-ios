@@ -15,9 +15,7 @@
 
 @implementation ProgramViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
+- (void)navButtonSetup {
     UIImage *buttonImage = [UIImage imageNamed:@"back_button"];
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button setImage:buttonImage forState:UIControlStateNormal];
@@ -26,7 +24,12 @@
     
     UIBarButtonItem *customBarItem = [[UIBarButtonItem alloc] initWithCustomView:button];
     self.navigationItem.leftBarButtonItem = customBarItem;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
     // Do any additional setup after loading the view.
+    [self navButtonSetup];
 }
 
 - (void)didReceiveMemoryWarning {

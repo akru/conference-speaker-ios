@@ -14,9 +14,6 @@
     GCDAsyncSocket *asyncSocket;
 }
 
-
 + (TCPSocketConnection *)sharedModel;
-- (void)writeData: (NSData *)jsonData;
-- (void)tcpSocketRead;
 
 @end
